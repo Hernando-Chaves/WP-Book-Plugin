@@ -1,0 +1,25 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.wp-core-ui select
+{
+	max-width: 100%!important;
+}
+.error
+{
+	color:red;
+}
+
+.custom-file-label::after
+{
+	content:"Buscar..."!important;
+}
+
+/*IMAGEN LIBRO EN TABLA*/
+.img_libro
+{
+	height: 50px;
+	width: 40px;
+}
