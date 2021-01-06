@@ -109,6 +109,72 @@ jQuery(function()
 		 });
 		
 	});
+	/*EDITA UN LIBRO*/
+
+	/*ACCIONAR MODAL PARA EDITA UN LIBRO*/
+	jQuery(document).on('click','.btn-book-edit', function(){
+		var 
+			attr       = jQuery(this).attr('data-id'),
+			tr         = jQuery(this).parent().parent(),
+			book_name  = tr.find(jQuery('td:nth-child(2)')).text(),
+			opt_shelf  = tr.find(jQuery('td:nth-child(3)')).text(),
+			sel_shelf  = jQuery('#txt_estante_edit option'),
+			correo     = tr.find(jQuery('td:nth-child(4)')).text(),
+			precio     = tr.find(jQuery('td:nth-child(5)')).text().split('$'),
+			opt_status = jQuery('#dd_status_edit option'),
+			sel_status = tr.find('.btn-status').attr('data-status'),
+			imagen     = tr.find(jQuery('td:nth-child(7) img')).attr('src')
+	    ;
+	    jQuery('#txt_estante_edit option:selected').prop('selected',false);
+	    jQuery('#dd_status_edit option:selected').prop('selected',false);
+	    jQuery('#txt_name_edit').val(book_name);
+	    jQuery('#txt_correo_edit').val(correo);
+	    jQuery('#dd_status_edit').val(status);
+	    jQuery('#dd_costo_edit').val(parseInt(precio[1]));
+	    jQuery('#book_image_edit').val(imagen);
+	    sel_shelf.each(function(){
+			 if(jQuery(this).text().trim() == opt_shelf.trim())
+			 {
+			 	 jQuery(this).prop('selected', true);
+			 }
+		});
+	    opt_status.each(function(){
+	    	if(jQuery(this).text().trim() == sel_status.trim())
+	    	{
+	    		jQuery(this).prop('selected', true);
+	    	}
+	    });
+	    jQuery('#book_image_edit').attr('src', imagen);
+
+	   /*EDITAR INFO DEL LIBRO*/
+	   jQuery(document).on('click','.btn-editar-book', function(){
+	   		var postdata  = jQuery('#form_edit_book').serialize();
+	   			postdata += "&action=admin_ajax_test&param=edit_book&book_id="+ attr;
+
+	   		jQuery.post(ajaxtest,postdata, function(response){
+	   			var data = jQuery.parseJSON(response)
+	   			if(data.status == 1)
+	   			{
+	   				Swal.fire({
+	   					position:'top-end',
+	   					title: data.mensaje,
+	   					icon: 'success',
+	   				});
+	   				setTimeout(function(){
+	   					location.reload();
+	   				},500);
+
+	   			}else {
+	   				Swal.fire({
+	   					position:'top-end',
+	   					title: data.mensaje,
+	   					icon: 'warning',
+	   				});
+	   			}
+	   		});
+	   });
+	   console.log(attr);
+	});
 	
 	/*CREA UN SHELF*/
 	jQuery('#bwc-add-book-shelf').validate({

@@ -18,12 +18,6 @@
 							<input type="email" name="txt_correo" id="txt_correo" class="form-control" placeholder="ingrese el correo electrónico" required>
 						</div>
 					</div>
-					<!-- <div class="row mb-3">
-						<label for="" class="col-form-label col-sm-3">Publicación</label>
-						<div class="col-sm-9">
-							<input type="text" name="txt_publicacion" id="txt_publicacion" class="form-control" placeholder="Ingrese la publicación">
-						</div>
-					</div> -->
 					<div class="row mb-3">
 						<label for="" class="col-form-label col-sm-3">Seleccione el estante</label>
 						<div class="col-sm-9">
@@ -76,12 +70,6 @@
 								</div>
 								
 							</div>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<label for="|" class="col-from-label col-sm-3">Descripción</label>
-						<div class="col-sm-9">
-							<textarea class="w-100 form-control" name="txt_descripcion" id="txt_descripcion" cols="30" rows="3"></textarea>
 						</div>
 					</div>
 					<div class="form-group">

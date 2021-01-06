@@ -155,6 +155,9 @@ class Books_Admin_Tool_Admin
 		echo " <pre>";
 			var_dump($title);
 		echo "</pre>";
+		$ruta_trailing = trailingslashit(plugin_dir_path( __FILE__ ));
+		echo "La Ruta Trailng es:" . $ruta_trailing .'<br>';
+		echo plugin_dir_path( __FILE__ );
 	}
 	/*Funcion para crear el sub menu*/
 	public function book_submenu_dashboard()
@@ -164,6 +167,11 @@ class Books_Admin_Tool_Admin
 	public function book_submenu_list()
 	{
 		global $wpdb;
+
+		$data_shelf = $wpdb->get_results(
+			$wpdb->prepare("SELECT * FROM " . SHELF_TABLE)
+		);
+		
 		$data_book = $wpdb->get_results(
 			 $wpdb->prepare(
 			 	"SELECT book.*, book_shelf.shelf_name 
@@ -305,6 +313,41 @@ class Books_Admin_Tool_Admin
 						'status'  => 1,
 						'mensaje' => 'El libro fue eliminado correctamente'
 					]);
+				}else {
+					echo json_encode([
+						'status'  => 0,
+						'mensaje' => 'Error en el id del libro'
+					]);
+				}
+			}elseif($param == 'edit_book')
+			{
+				$book_id     = isset($_POST['book_id']) ? intval($_POST['book_id']) : 0;
+				$nombre      = isset($_POST['txt_name_edit']) ? $_POST['txt_name_edit'] : '';
+				$correo      = isset($_POST['txt_correo_edit']) ? $_POST['txt_correo_edit'] : '';
+				$estante     = isset($_POST['txt_estante_edit']) ? intval($_POST['txt_estante_edit']) : 0;
+				$status      = isset($_POST['dd_status_edit']) ? $_POST['dd_status_edit'] : '';
+				$precio      = isset($_POST['dd_costo_edit']) ? intval($_POST['dd_costo_edit']) : '';
+				$img_book    = isset($_POST['book_cover_image_edit']) ? $_POST['book_cover_image_edit'] : '';
+
+				$data = [
+						'name'            => strtolower($nombre),
+						'precio'          => intval($precio),
+						'correo'          => strtolower($correo),
+						'shelf_id'        => intval($estante),
+						'status'          => $status,
+						'book_image'      => $img_book
+				];
+
+
+				if($book_id > 0)
+				{
+					$wpdb->update( OWN_TABLE, $data,['id'=> $book_id] );
+
+					echo json_encode([
+						'status'  => 1,
+						'mensaje' => 'El libro fue editado correctamente'
+					]);
+
 				}else {
 					echo json_encode([
 						'status'  => 0,
