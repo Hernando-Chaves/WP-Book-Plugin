@@ -30,6 +30,7 @@ jQuery(function()
 
 	/*CREA UN LIBRO*/
 	jQuery('#form_create_book').validate({
+
 		messages: {
 			txt_name   : 'Ingresa el nombre del libro',
 			txt_correo : {
@@ -37,7 +38,7 @@ jQuery(function()
 				email    : 'Ingresa un correo valido'
 			},
 			txt_estante : 'Selecciona un estante para el libro',
-			dd_costo    : 'Ingres el precio del libro'
+			dd_costo    : 'Ingresa el precio del libro'
 		},
 		submitHandler:function(){
 			var postdata = jQuery('#form_create_book').serialize();
@@ -125,6 +126,7 @@ jQuery(function()
 			sel_status = tr.find('.btn-status').attr('data-status'),
 			imagen     = tr.find(jQuery('td:nth-child(7) img')).attr('src')
 	    ;
+	    jQuery('#id_edicion').val(attr);
 	    jQuery('#txt_estante_edit option:selected').prop('selected',false);
 	    jQuery('#dd_status_edit option:selected').prop('selected',false);
 	    jQuery('#txt_name_edit').val(book_name);
@@ -132,6 +134,7 @@ jQuery(function()
 	    jQuery('#dd_status_edit').val(status);
 	    jQuery('#dd_costo_edit').val(parseInt(precio[1]));
 	    jQuery('#book_image_edit').val(imagen);
+	    jQuery('#book_cover_image_edit').val(imagen);
 	    sel_shelf.each(function(){
 			 if(jQuery(this).text().trim() == opt_shelf.trim())
 			 {
@@ -146,35 +149,73 @@ jQuery(function()
 	    });
 	    jQuery('#book_image_edit').attr('src', imagen);
 
-	   /*EDITAR INFO DEL LIBRO*/
-	   jQuery(document).on('click','.btn-editar-book', function(){
-	   		var postdata  = jQuery('#form_edit_book').serialize();
-	   			postdata += "&action=admin_ajax_test&param=edit_book&book_id="+ attr;
-
-	   		jQuery.post(ajaxtest,postdata, function(response){
-	   			var data = jQuery.parseJSON(response)
-	   			if(data.status == 1)
-	   			{
-	   				Swal.fire({
-	   					position:'top-end',
-	   					title: data.mensaje,
-	   					icon: 'success',
-	   				});
-	   				setTimeout(function(){
-	   					location.reload();
-	   				},500);
-
-	   			}else {
-	   				Swal.fire({
-	   					position:'top-end',
-	   					title: data.mensaje,
-	   					icon: 'warning',
-	   				});
-	   			}
-	   		});
-	   });
-	   console.log(attr);
 	});
+   /*EDITAR INFO DEL LIBRO*/
+   var formEdit = jQuery('#form_edit_book').validate({
+   	rules: {
+   		txt_correo_edit : {
+   			required : true,
+   			email    : true,
+   			remote   : {
+   				url : ajaxtest,
+   				type: 'post',
+   				data: {
+   					txt_correo_edit:function(){
+   						return jQuery('#form_edit_book :input[name="txt_correo_edit"]').val()
+   					},
+   					action: 'admin_ajax_test'
+   				}
+   			}
+   		}
+   	},
+
+   	messages: {
+   		txt_name_edit   : 'Ingresa el nombre del libro',
+   		txt_correo_edit : {
+   			required    : 'Este campo es requerido',
+   			email       : 'Ingresa un correo valido',
+   			remote      : 'Este correo ya existe, por favor ingresa uno distinto'
+   		},
+   		txt_estante     : 'Selecciona un estante para el libro',
+   		dd_costo        : 'Ingresa el precio del libro'
+   	},
+
+   	submitHandler:function(){
+   		var 
+   			attr       = jQuery('#id_edicion').val()
+   		;
+
+   		var postdata  = jQuery('#form_edit_book').serialize();
+   			postdata += "&action=admin_ajax_test&param=edit_book&book_id="+ attr
+   		;
+
+   		jQuery.post(ajaxtest,postdata, function(response){
+   			var data = jQuery.parseJSON(response)
+   			if(data.status == 1)
+   			{
+   				Swal.fire({
+   					position:'top-end',
+   					title: data.mensaje,
+   					icon: 'success',
+   				});
+   				setTimeout(function(){
+   					location.reload();
+   				},500);
+
+   			}else {
+   				Swal.fire({
+   					position:'top-end',
+   					title: data.mensaje,
+   					icon: 'warning',
+   				});
+   			}
+   		});
+   	}
+   });
+
+   jQuery(document).on('click','.cancelar_edit',function(){
+   	formEdit.resetForm();
+   });
 	
 	/*CREA UN SHELF*/
 	jQuery('#bwc-add-book-shelf').validate({
@@ -269,6 +310,18 @@ jQuery(function()
 			var image_data = uploaded_image.toJSON();
 			jQuery('#book_image').attr('src',image_data.url);
 			jQuery('#book_cover_image').val(image_data.url);
+		});
+	});
+
+	/*IMAGEN EDICION*/
+	jQuery(document).on('click','#img_book_edit', function(){
+		var image = wp.media({
+
+		}).open().on('select', function(){
+			var uploaded_image = image.state().get('selection').first();
+			var image_data = uploaded_image.toJSON();
+			jQuery('#book_image_edit').attr('src',image_data.url);
+			jQuery('#book_cover_image_edit').val(image_data.url);
 		});
 	});
 

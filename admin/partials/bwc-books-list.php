@@ -99,6 +99,7 @@
 	<div class="modal-dialog modal-dialog-centered modal-lg" >
 		<div class="modal-content px-4 py-2">
 			<form  action="javascript:void(0)" id="form_edit_book" method="post">
+				<input type="hidden" id="id_edicion">
 				<div class="modal-header">
 					<h3>Editar libro</h3>
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -114,7 +115,7 @@
 						<div class="row mb-3">
 							<label for="" class="col-frorm-label col-sm-3">Correo</label>
 							<div class="col-sm-9">
-								<input type="email" name="txt_correo_edit" id="txt_correo_edit" class="form-control" placeholder="ingrese el correo electrónico" required>
+								<input type="email" name="txt_correo_edit" id="txt_correo_edit" class="form-control" placeholder="ingrese el correo electrónico" >
 							</div>
 						</div>
 						<div class="row mb-3">
@@ -176,8 +177,8 @@
 				<div class="modal-footer">
 					<div class="form-group">
 							<div class="">
-								<button type="button" class="btn btn-sm btn-primary btn-danger" data-dismiss="modal">Cancelar</button>
-								<button type="button" class="btn btn-sm btn-primary btn-info btn-editar-book" >Editar</button>
+								<button type="button" class="btn btn-sm btn-primary btn-danger cancelar_edit" data-dismiss="modal">Cancelar</button>
+								<button class="btn btn-sm btn-primary btn-info " >Editar</button>
 							</div>
 						</div>
 				</div>

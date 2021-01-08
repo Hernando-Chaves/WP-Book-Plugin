@@ -1,9 +1,4 @@
 
-	.custom-file-input:lang(en)~.custom-file-label::after
-		{
-			content:"Buscar...";
-		}
-</style>
 <div class="container mt-4">
 	<div class="row">
 		<div class="col-sm-12 card">

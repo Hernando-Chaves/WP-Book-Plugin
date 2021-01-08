@@ -148,16 +148,20 @@ class Books_Admin_Tool_Admin
 	{
 		global $wpdb;
 
-		$title = $wpdb->get_row(
-			$wpdb->prepare('SELECT * FROM books_posts WHERE ID = %d', 1)
+		$title = $wpdb->get_col(
+			$wpdb->prepare('SELECT correo FROM ' . OWN_TABLE)
 		);
+		if(in_array('bohhhgota@gmail.com', $title))
+		{
+			echo 'Si esta';
+		}else{
+			echo 'No esta';
+		}
 
 		echo " <pre>";
 			var_dump($title);
 		echo "</pre>";
-		$ruta_trailing = trailingslashit(plugin_dir_path( __FILE__ ));
-		echo "La Ruta Trailng es:" . $ruta_trailing .'<br>';
-		echo plugin_dir_path( __FILE__ );
+		
 	}
 	/*Funcion para crear el sub menu*/
 	public function book_submenu_dashboard()
@@ -219,140 +223,163 @@ class Books_Admin_Tool_Admin
 		ob_end_clean();
 		echo $template;
 	}
+
+
 	public function books_admin_ajax_function()
 	{
 		global $wpdb, $table_prefix;
 		$param = isset($_REQUEST['param']) ? $_REQUEST['param'] : '';
+		
+		$email = isset($_POST['txt_correo_edit']) ? $_POST['txt_correo_edit'] : '';
 
-		if(!empty($param))
+		if(isset($_POST['txt_correo_edit']))
 		{
-			if($param == "create_book_shelf")
+			$col  = 'correo';
+			$data = $_POST['txt_correo_edit'];
+			$tabla = OWN_TABLE;
+		}
+
+		$data_val = $wpdb->get_col(
+			$wpdb->prepare('SELECT '. $col .' FROM ' . $tabla ) );
+		if(in_array($data, $data_val))
+		{
+			echo json_encode(false);
+		}else{
+			echo json_encode('Exclente perrazazo');
+		
+			if(!empty($param))
 			{
-				$nombre    = isset($_REQUEST['txt_name_shelf']) ? $_REQUEST['txt_name_shelf'] : '';
-				$capacidad = isset($_REQUEST['dd_capacidad']) ? $_REQUEST['dd_capacidad'] : '';
-				$ubicacion = isset($_REQUEST['txt_ubicacion']) ? $_REQUEST['txt_ubicacion'] : '';
-				$status    = isset($_REQUEST['dd_status_shelf']) ? $_REQUEST['dd_status_shelf'] : '';
-
-				$wpdb->insert(SHELF_TABLE,[
-					'shelf_name'     => $nombre,
-					'capacity'       => $capacidad,
-					'shelf_location' => $ubicacion,
-					'status'         => $status
-				]);
-
-				if($wpdb->insert_id > 0)
+				if($param == "create_book_shelf")
 				{
-					echo json_encode([
-						'status'  => 1,
-						'mensaje' => 'El estante del libro fue creado correctamente',
-					]);
-				} else {
-					echo json_encode([
-						'status'  => 0,
-						'mensaje' => 'Hubo un error al crear el estante del libro',
-					]);
-				}
-			}elseif($param == "delete_book_shelf")
-			{
-				$shelf_id = isset($_REQUEST['shelf_id']) ? intval($_REQUEST['shelf_id']) : 0;
+					$nombre    = isset($_REQUEST['txt_name_shelf']) ? $_REQUEST['txt_name_shelf'] : '';
+					$capacidad = isset($_REQUEST['dd_capacidad']) ? $_REQUEST['dd_capacidad'] : '';
+					$ubicacion = isset($_REQUEST['txt_ubicacion']) ? $_REQUEST['txt_ubicacion'] : '';
+					$status    = isset($_REQUEST['dd_status_shelf']) ? $_REQUEST['dd_status_shelf'] : '';
 
-				if($shelf_id > 0)
+					$wpdb->insert(SHELF_TABLE,[
+						'shelf_name'     => $nombre,
+						'capacity'       => $capacidad,
+						'shelf_location' => $ubicacion,
+						'status'         => $status
+					]);
+
+					if($wpdb->insert_id > 0)
+					{
+						echo json_encode([
+							'status'  => 1,
+							'mensaje' => 'El estante del libro fue creado correctamente',
+						]);
+					} else {
+						echo json_encode([
+							'status'  => 0,
+							'mensaje' => 'Hubo un error al crear el estante del libro',
+						]);
+					}
+				}elseif($param == "delete_book_shelf")
 				{
-					$wpdb->delete(SHELF_TABLE, ['id'=> $shelf_id,]);
-					echo json_encode([
-						'status'   => 1,
-						'mensaje'  => "El estante fue borrado correctamente"
-					]);
-				}else{
-					echo json_encode([
-						'status'   => 0,
-						'mensaje'  => "El ID de estante no es valido"
-					]);
-				}
-			} elseif($param == 'create_book')
-			{
-				$nombre      = isset($_REQUEST['txt_name']) ? $_REQUEST['txt_name'] : '';
-				$correo      = isset($_REQUEST['txt_correo']) ? $_REQUEST['txt_correo'] : '';
-				$estante     = isset($_REQUEST['txt_estante']) ? intval($_REQUEST['txt_estante']) : 0;
-				$status      = isset($_REQUEST['dd_status']) ? $_REQUEST['dd_status'] : '';
-				$precio      = isset($_REQUEST['dd_costo']) ? intval($_REQUEST['dd_costo']) : '';
-				$img_book    = isset($_REQUEST['book_cover_image']) ? $_REQUEST['book_cover_image'] : '';
-				$descripcion = isset($_REQUEST['txt_descripcion']) ? $_REQUEST['txt_descripcion'] : '';
+					$shelf_id = isset($_REQUEST['shelf_id']) ? intval($_REQUEST['shelf_id']) : 0;
 
-				$wpdb->insert(OWN_TABLE,[
-					'name'            => strtolower($nombre),
-					'precio'          => $precio,
-					'description'     => $descripcion,
-					'correo'          => $correo,
-					'shelf_id'        => $estante,
-					'status'          => $status,
-					'book_image'      => $img_book,
-				]);
-
-				if($wpdb->insert_id > 0)
+					if($shelf_id > 0)
+					{
+						$wpdb->delete(SHELF_TABLE, ['id'=> $shelf_id,]);
+						echo json_encode([
+							'status'   => 1,
+							'mensaje'  => "El estante fue borrado correctamente"
+						]);
+					}else{
+						echo json_encode([
+							'status'   => 0,
+							'mensaje'  => "El ID de estante no es valido"
+						]);
+					}
+				} elseif($param == 'create_book')
 				{
-					echo json_encode([
-						'status'   => 1,
-						'mensaje'  => "El libro fue creado correctamente"
-					]);
-				}else{
-					echo json_encode([
-						'status'   => 0,
-						'mensaje'  => "Hubo un error al crear el libro"
-					]);
-				}
+					$nombre      = isset($_REQUEST['txt_name']) ? $_REQUEST['txt_name'] : '';
+					$correo      = isset($_REQUEST['txt_correo']) ? $_REQUEST['txt_correo'] : '';
+					$estante     = isset($_REQUEST['txt_estante']) ? intval($_REQUEST['txt_estante']) : 0;
+					$status      = isset($_REQUEST['dd_status']) ? $_REQUEST['dd_status'] : '';
+					$precio      = isset($_REQUEST['dd_costo']) ? intval($_REQUEST['dd_costo']) : '';
+					$img_book    = isset($_REQUEST['book_cover_image']) ? $_REQUEST['book_cover_image'] : '';
+					$descripcion = isset($_REQUEST['txt_descripcion']) ? $_REQUEST['txt_descripcion'] : '';
 
-			}elseif($param == 'delete_book')
-			{
-				$book_id = isset($_REQUEST['book_id']) ? intval($_REQUEST['book_id']) : 0;
-
-				if($book_id > 0)
-				{
-					$wpdb->delete(OWN_TABLE,['id'=> $book_id]);
-					echo json_encode([
-						'status'  => 1,
-						'mensaje' => 'El libro fue eliminado correctamente'
-					]);
-				}else {
-					echo json_encode([
-						'status'  => 0,
-						'mensaje' => 'Error en el id del libro'
-					]);
-				}
-			}elseif($param == 'edit_book')
-			{
-				$book_id     = isset($_POST['book_id']) ? intval($_POST['book_id']) : 0;
-				$nombre      = isset($_POST['txt_name_edit']) ? $_POST['txt_name_edit'] : '';
-				$correo      = isset($_POST['txt_correo_edit']) ? $_POST['txt_correo_edit'] : '';
-				$estante     = isset($_POST['txt_estante_edit']) ? intval($_POST['txt_estante_edit']) : 0;
-				$status      = isset($_POST['dd_status_edit']) ? $_POST['dd_status_edit'] : '';
-				$precio      = isset($_POST['dd_costo_edit']) ? intval($_POST['dd_costo_edit']) : '';
-				$img_book    = isset($_POST['book_cover_image_edit']) ? $_POST['book_cover_image_edit'] : '';
-
-				$data = [
+					$wpdb->insert(OWN_TABLE,[
 						'name'            => strtolower($nombre),
-						'precio'          => intval($precio),
-						'correo'          => strtolower($correo),
-						'shelf_id'        => intval($estante),
+						'precio'          => $precio,
+						'description'     => $descripcion,
+						'correo'          => $correo,
+						'shelf_id'        => $estante,
 						'status'          => $status,
-						'book_image'      => $img_book
-				];
+						'book_image'      => $img_book,
+					]);
 
+					if($wpdb->insert_id > 0)
+					{
+						echo json_encode([
+							'status'   => 1,
+							'mensaje'  => "El libro fue creado correctamente"
+						]);
+					}else{
+						echo json_encode([
+							'status'   => 0,
+							'mensaje'  => "Hubo un error al crear el libro"
+						]);
+					}
 
-				if($book_id > 0)
+				}elseif($param == 'delete_book')
 				{
-					$wpdb->update( OWN_TABLE, $data,['id'=> $book_id] );
+					$book_id = isset($_REQUEST['book_id']) ? intval($_REQUEST['book_id']) : 0;
 
-					echo json_encode([
-						'status'  => 1,
-						'mensaje' => 'El libro fue editado correctamente'
-					]);
+					if($book_id > 0)
+					{
+						$wpdb->delete(OWN_TABLE,['id'=> $book_id]);
+						echo json_encode([
+							'status'  => 1,
+							'mensaje' => 'El libro fue eliminado correctamente'
+						]);
+					}else {
+						echo json_encode([
+							'status'  => 0,
+							'mensaje' => 'Error en el id del libro'
+						]);
+					}
+				}elseif($param == 'edit_book')
+				{
 
-				}else {
-					echo json_encode([
-						'status'  => 0,
-						'mensaje' => 'Error en el id del libro'
-					]);
+					$book_id     = isset($_POST['book_id']) ? intval($_POST['book_id']) : 0;
+					$nombre      = isset($_POST['txt_name_edit']) ? $_POST['txt_name_edit'] : '';
+					$correo      = isset($_POST['txt_correo_edit']) ? $_POST['txt_correo_edit'] : '';
+					$estante     = isset($_POST['txt_estante_edit']) ? intval($_POST['txt_estante_edit']) : 0;
+					$status      = isset($_POST['dd_status_edit']) ? $_POST['dd_status_edit'] : '';
+					$precio      = isset($_POST['dd_costo_edit']) ? intval($_POST['dd_costo_edit']) : '';
+					$img_book    = isset($_POST['book_cover_image_edit']) ? $_POST['book_cover_image_edit'] : '';
+					$img_input   = isset($_POST['book_cover_image_edit']) ? $_POST['book_cover_image_edit'] : '';
+
+					
+					$data = [
+							'name'            => strtolower($nombre),
+							'precio'          => intval($precio),
+							'correo'          => strtolower($correo),
+							'shelf_id'        => intval($estante),
+							'status'          => $status,
+							'book_image'      => $img_input
+					];
+
+
+					if($book_id > 0)
+					{
+						$wpdb->update( OWN_TABLE, $data,['id'=> $book_id] );
+
+						echo json_encode([
+							'status'  => 1,
+							'mensaje' => 'El libro fue editado correctamente'
+						]);
+
+					}else {
+						echo json_encode([
+							'status'  => 0,
+							'mensaje' => 'Error en el id del libro'
+						]);
+					}
 				}
 			}
 		}
